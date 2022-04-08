@@ -3,4 +3,4 @@
 *.csv
 *.txt
 *.bak
-pnp_client_/target
+pnp_client/target
