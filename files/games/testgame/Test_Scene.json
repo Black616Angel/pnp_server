@@ -1,0 +1,58 @@
+{
+    "name": "String",
+    "height": 5,
+    "width": 6,
+    "square_size": 70,
+    "tokens": [
+        {
+            "name": "Rustacean",
+            "description": "Test Rustacean",
+            "texture_path": "box.png",
+            "stats": [
+                {
+                    "name": "String",
+                    "value": "Value"
+                }
+            ],
+            "height": 2,
+            "width": 2,
+            "position_x": 1,
+            "position_y": 3,
+            "click_action": {
+                "type": "ShowStats",
+                "action": ""
+            }
+        },
+        {
+            "name": "Rustacean",
+            "description": "Test Rustacean",
+            "texture_path": "rustacean_happy.png",
+            "stats": [
+                {
+                    "name": "String",
+                    "value": "Value"
+                }
+            ],
+            "height": 3,
+            "width": 3,
+            "position_x": 1,
+            "position_y": 1
+        },
+        {
+            "name": "Rustacean",
+            "description": "Test Rustacean",
+            "texture_path": "rustacean_happy.png",
+            "stats": [
+                {
+                    "name": "String",
+                    "value": "Value"
+                }
+            ],
+            "height": 1,
+            "width": 1,
+            "position_x": 3,
+            "position_y": 3
+        }
+    ],
+    "texture_background": ""
+}

@@ -1,1 +1,5 @@
 /target
+*.log
+*.csv
+*.txt
+*.bak
