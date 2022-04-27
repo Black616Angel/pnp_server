@@ -4,3 +4,4 @@
 *.txt
 *.bak
 pnp_client/target
+ignore/

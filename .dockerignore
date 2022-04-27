@@ -3,3 +3,4 @@ Dockerfile
 .gitignore
 target/
 pnp_client/target
+ignore/

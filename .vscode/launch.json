@@ -25,6 +25,24 @@
         {
             "type": "lldb",
             "request": "launch",
+            "name": "Debug executable 'pnp_client'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=pnp_client",
+                    "--package=pnp_client"
+                ],
+                "filter": {
+                    "name": "pnp_client",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}/pnp_client"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
             "name": "Debug unit tests in executable 'pnp_server'",
             "cargo": {
                 "args": [
@@ -40,6 +58,25 @@
             },
             "args": [],
             "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'pnp_client'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=pnp_client",
+                    "--package=pnp_client"
+                ],
+                "filter": {
+                    "name": "pnp_client",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}/pnp_client"
         }
     ]
 }

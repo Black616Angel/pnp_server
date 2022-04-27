@@ -4,22 +4,24 @@ pub mod token;
 pub mod scene;
 pub mod scene_json;
 pub mod diff_json;
+pub mod api_json;
 pub mod ui;
 pub mod game_picker;
+#[cfg(test)]
+mod tests;
 
 use macroquad::prelude::*;
 use scene_json::ClickAction;
 
 use crate::scene::*;
 use crate::ui::*;
-use crate::types::*;
 use crate::game_picker::*;
 
 #[macroquad::main("PnP")]
 async fn main(){
 
     // Gamepicker as root of it all
-    let gp = GamePicker::new("files".to_string());
+    let gp = GamePicker::new("/".to_string());
     let mut scene = gp.get_scene().await.unwrap();
     info!("Started");
 
@@ -46,11 +48,11 @@ async fn main(){
             next_scene = None;
             if scene.name == "Game Picker" {
                 let mut split = next_scene_name.split("/");
-                let folder = gp.root_folder.clone() + "/games/" + split.next().unwrap();
-                let filename = folder.clone() + "/" + split.next().unwrap();
-                info!("{}", filename);
+                let folder = gp.root_folder.clone() + "games/" + split.next().unwrap();
+                let filename = folder.clone() + split.next().unwrap();
+                info!("filename: {}", filename);
                 if let Ok(new) = Scene::new_from_file(filename, Some(folder)).await {
-                    info!("{}", scene.name);
+                    info!("scene.name: {}", scene.name);
                     scene = new;
                 };
             } else {

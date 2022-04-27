@@ -16,7 +16,7 @@ impl Diff {
     }
 
     fn read_diffs(game_name: String, hash: String) -> Result<DiffJson, SceneJson> {
-        let folder = "files/games/".to_string() + &game_name + "/";
+        let folder = "/var/www/games/".to_string() + &game_name + "/";
         let contents = Diff::read_file(folder.clone() + "DefaultScene.json");
         let diff_json: DefaultSceneJson = serde_json::de::from_str(&contents).unwrap();
 

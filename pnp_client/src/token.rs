@@ -25,7 +25,7 @@ impl Token {
         let pos_grid = Vec2D::from((json.position_x as f32, json.position_y as f32)) - 1_f32;
         let position = pos_grid * square_size; // - (square_size / 2) as f32;
         info!("");
-        let texture = load_texture(&(folder + "/" + &json.texture_path)).await.unwrap();
+        let texture = load_texture(&(folder + &json.texture_path)).await.unwrap();
         let size: Vec2D = Vec2D::from(((json.width) as f32, (json.height) as f32));
         if let Some(click_action) = json.click_action {
             Token{ position: position.clone(), size, texture, click_counter: 0, pos_grid, dragged: false, click_action }
