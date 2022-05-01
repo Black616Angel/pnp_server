@@ -1,4 +1,4 @@
-use std::error::Error;
+use std::{collections::HashMap, error::Error};
 
 use pnp_client::api_json::*;
 
@@ -15,26 +15,28 @@ impl Api {
                 } else {
                     Err("games folder not found???".to_string())
                 }
-            },
-            _ => {
-                Err("unknown api call".to_string())
             }
+            _ => Err("unknown api call".to_string()),
         }
     }
-    pub fn call_game(call: String, game_name: String, root_folder: String) -> Result<String, String> {
+
+    pub fn call_game(
+        call: String,
+        game_name: String,
+        root_folder: String,
+        query_param: HashMap<String, String>,
+    ) -> Result<String, String> {
         let call: &str = &call;
         match call {
-            "games" => {
+            "hash" => {
                 if let Ok(ret) = Api::get_game_folders(&(root_folder + "/games")) {
                     let ret = serde_json::ser::to_string(&StringVecJson::from_vec(ret)).unwrap();
                     Ok(ret)
                 } else {
                     Err("games folder not found???".to_string())
                 }
-            },
-            _ => {
-                Err("unknown api call".to_string())
             }
+            _ => Err("unknown api call".to_string()),
         }
     }
 
@@ -43,7 +45,6 @@ impl Api {
         let mut ret: Vec<String> = Vec::new();
         for file in files {
             if let Ok(file) = file {
-
                 // we only want the folders, since each folder is a game
                 if let Ok(filetype) = file.file_type() {
                     if !filetype.is_dir() {
@@ -51,7 +52,7 @@ impl Api {
                     }
                 }
                 // if it is a folder, we return it
-                if let Ok(filename) = file.file_name().into_string(){
+                if let Ok(filename) = file.file_name().into_string() {
                     ret.push(filename);
                 }
             }

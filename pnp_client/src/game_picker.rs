@@ -34,8 +34,9 @@ impl GamePicker {
         let mut row = 1;
         let mut col = 1;
         for game in game_names {
-            println!("{}", game);
+            info!("game: {}", game);
             let last_scene = self.get_last_scene_name(&game).await?;
+            info!("last_scene: {}", last_scene);
             let token = SceneJsonToken{
                                                     name: game.clone(),
                                                     height: 2,
@@ -44,7 +45,7 @@ impl GamePicker {
                                                     position_y: row,
                                                     stats: None,
                                                     description: Some("".to_string()),
-                                                    click_action: Some(ClickAction::SceneChange(game + &last_scene)),
+                                                    click_action: Some(ClickAction::SceneChange(game + "/" + &last_scene)),
                                                     texture_path: "objects/defaults/game_texture.png".to_string(), //TODO: pictures for games
                                                 };
             scene.tokens.push(token);

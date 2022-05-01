@@ -1839,4 +1839,3 @@ function http_make_request (c, f, i, j) {
     e
   )
 }
-load('root/pnp_client.wasm')

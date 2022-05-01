@@ -1,39 +1,45 @@
+pub mod api_json;
 pub mod camera;
-pub mod types;
-pub mod token;
+pub mod diff_json;
+pub mod game_picker;
+pub mod params;
 pub mod scene;
 pub mod scene_json;
-pub mod diff_json;
-pub mod api_json;
-pub mod ui;
-pub mod game_picker;
 #[cfg(test)]
 mod tests;
+pub mod token;
+pub mod types;
+pub mod ui;
 
 use macroquad::prelude::*;
 use scene_json::ClickAction;
 
+use crate::game_picker::*;
+use crate::params::PROGRAM_PARAMETERS;
 use crate::scene::*;
 use crate::ui::*;
-use crate::game_picker::*;
 
 #[macroquad::main("PnP")]
-async fn main(){
-
+async fn main() {
     // Gamepicker as root of it all
+    info!("Started5");
+    let params: Vec<String> = PROGRAM_PARAMETERS.clone();
+    info!("params: {:?}", params);
+    for param in params {
+        info!("{}", param);
+    }
+
     let gp = GamePicker::new("/".to_string());
     let mut scene = gp.get_scene().await.unwrap();
-    info!("Started");
-
     let mut ui = UIList::new();
 
     let mut next_scene: Option<String> = None;
     loop {
-        if let Some(action) =  scene.click() {
+        if let Some(action) = scene.click() {
             match action {
                 ClickAction::SceneChange(scene) => {
                     next_scene = Some(scene);
-                },
+                }
                 _ => {}
             }
         }
@@ -47,16 +53,18 @@ async fn main(){
         if let Some(next_scene_name) = next_scene {
             next_scene = None;
             if scene.name == "Game Picker" {
-                let mut split = next_scene_name.split("/");
-                let folder = gp.root_folder.clone() + "games/" + split.next().unwrap();
-                let filename = folder.clone() + split.next().unwrap();
-                info!("filename: {}", filename);
-                if let Ok(new) = Scene::new_from_file(filename, Some(folder)).await {
-                    info!("scene.name: {}", scene.name);
-                    scene = new;
-                };
+                let split = next_scene_name.split("/").collect::<Vec<&str>>();
+                if split.len() == 2 {
+                    let folder = gp.root_folder.clone() + "games/" + split[0] + "/";
+                    let filename = folder.clone() + split[1];
+                    // info!("filename: {}", filename);
+                    if let Ok(new) = Scene::new_from_file(filename, Some(folder)).await {
+                        info!("scene.name: {}", scene.name);
+                        scene = new;
+                    };
+                } else {
+                }
             } else {
-
             }
         }
     }
