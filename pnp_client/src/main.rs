@@ -15,7 +15,7 @@ use macroquad::prelude::*;
 use scene_json::ClickAction;
 
 use crate::game_picker::*;
-use crate::params::PROGRAM_PARAMETERS;
+use crate::params::*;
 use crate::scene::*;
 use crate::ui::*;
 
@@ -23,10 +23,8 @@ use crate::ui::*;
 async fn main() {
     // Gamepicker as root of it all
     info!("Started5");
-    let params: Vec<String> = PROGRAM_PARAMETERS.clone();
-    info!("params: {:?}", params);
-    for param in params {
-        info!("{}", param);
+    for param in PROGRAM_PARAMETERS.clone() {
+        info!("{}: {}", param.key, param.value);
     }
 
     let gp = GamePicker::new("/".to_string());

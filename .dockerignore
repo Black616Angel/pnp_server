@@ -4,3 +4,5 @@ Dockerfile
 target/
 pnp_client/target
 ignore/
+.vscode/
+.devcontainer/

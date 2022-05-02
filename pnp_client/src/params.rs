@@ -1,7 +1,13 @@
 use lazy_static::lazy_static;
 
+#[derive(Debug, Clone)]
+pub struct KeyValuePair {
+    pub key: String,
+    pub value: String,
+}
+
 lazy_static! {
-    pub static ref PROGRAM_PARAMETERS: Vec<String> = {
+    pub static ref PROGRAM_PARAMETERS: Vec<KeyValuePair> = {
         #[cfg(target_arch = "wasm32")]
         {
             use sapp_jsutils::JsObject;
@@ -13,7 +19,7 @@ lazy_static! {
             }
 
             let count = unsafe { miniquad_parameters_param_count() };
-            let mut result: Vec<String> = Vec::new();
+            let mut result: Vec<KeyValuePair> = Vec::new();
             for i in 0..count {
                 let mut key = String::new();
                 unsafe {
@@ -24,21 +30,33 @@ lazy_static! {
                 unsafe {
                     miniquad_parameters_get_value(i).to_string(&mut value);
                 }
-
-                let dash = if key.chars().count() == 1 { "-" } else { "--" };
-                if value == "" {
-                    result.push(format!("{}{}", dash, key));
-                } else {
-                    result.push(format!("{}{}={}", dash, key, &value));
-                }
+                result.push(KeyValuePair { key, value });
             }
             result
         }
 
         #[cfg(not(target_arch = "wasm32"))]
-        {
+        { // it's not planned, but who knows...
             use std::env;
-            env::args().collect()
+            let mut result: Vec<KeyValuePair> = Vec::new();
+            for kvp in env::args() {
+                let kvp = kvp.replace("-", "");
+                let mut i = 0;
+                let mut key = "".to_string();
+                let mut value = "".to_string();
+                for spl in kvp.split("=") {
+                    if i == 0 {
+                        key = spl.to_string();
+                    } else if i == 1 {
+                        value = spl.to_string();
+                    } else {
+                        value = value + &("=".to_string() + spl);
+                    }
+                    i += 1;
+                }
+                result.push(KeyValuePair { key, value });
+            }
+            result
         }
     };
 }
