@@ -10,6 +10,7 @@ mod tests;
 pub mod token;
 pub mod types;
 pub mod ui;
+pub mod user;
 
 use macroquad::prelude::*;
 use scene_json::ClickAction;
