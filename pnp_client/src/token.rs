@@ -1,11 +1,14 @@
-use crate::{types::*, scene_json::{SceneJsonToken, ClickAction}};
+use crate::{
+    scene_json::{ClickAction, SceneJsonToken},
+    types::*,
+};
 
 use macroquad::prelude::*;
 
 pub enum ClickMode {
-    CLICKED,
-    DRAGGED,
-    NONE,
+    Clicked,
+    Dragged,
+    None,
 }
 
 #[derive(Clone, Debug)]
@@ -20,7 +23,6 @@ pub struct Token {
 }
 
 impl Token {
-
     pub async fn new_from_json(folder: String, json: SceneJsonToken, square_size: f32) -> Self {
         let pos_grid = Vec2D::from((json.position_x as f32, json.position_y as f32)) - 1_f32;
         let position = pos_grid * square_size; // - (square_size / 2) as f32;
@@ -28,12 +30,28 @@ impl Token {
         let texture = load_texture(&(folder + &json.texture_path)).await.unwrap();
         let size: Vec2D = Vec2D::from(((json.width) as f32, (json.height) as f32));
         if let Some(click_action) = json.click_action {
-            Token{ position: position.clone(), size, texture, click_counter: 0, pos_grid, dragged: false, click_action }
+            Token {
+                position: position.clone(),
+                size,
+                texture,
+                click_counter: 0,
+                pos_grid,
+                dragged: false,
+                click_action,
+            }
         } else {
-            Token{ position: position.clone(), size, texture, click_counter: 0, pos_grid, dragged: false, click_action: ClickAction::ShowStats("".to_string()) }
+            Token {
+                position: position.clone(),
+                size,
+                texture,
+                click_counter: 0,
+                pos_grid,
+                dragged: false,
+                click_action: ClickAction::ShowStats("".to_string()),
+            }
         }
     }
-    
+
     pub fn in_token(&self, position: Vec2D, square_size: f32) -> bool {
         let origin = self.position.clone();
         let size = self.size * square_size;
@@ -45,8 +63,7 @@ impl Token {
         self.position += direction;
     }
 
-    pub fn final_move(&mut self, square_size: f32) {
-
+    pub fn final_move(&mut self, square_size: f32, scene_size: Vec2D) {
         let rem = self.position.clone() % square_size;
         self.pos_grid.x = if rem.x > square_size / 2_f32 {
             (self.position.x - rem.x) / square_size + 1_f32
@@ -58,10 +75,39 @@ impl Token {
         } else {
             (self.position.y - rem.y) / square_size
         };
+
+        info!("pos_grid: {:?}", self.pos_grid);
+
+        info!(
+            "scene_size.x {} + self.size.x {}: {}",
+            scene_size.x,
+            self.size.x,
+            scene_size.x + self.size.x
+        );
+        info!(
+            "scene_size.y {} + self.size.y {}: {}",
+            scene_size.y,
+            self.size.y,
+            scene_size.y + self.size.y
+        );
+
+        // don't go over the map ends
+        if self.pos_grid.x + self.size.x > scene_size.x {
+            self.pos_grid.x = scene_size.x - self.size.x;
+        }
+        if self.pos_grid.y + self.size.y > scene_size.y {
+            self.pos_grid.y = scene_size.y - self.size.y;
+        }
+        if self.pos_grid.x < 0_f32 {
+            self.pos_grid.x = 0_f32;
+        }
+        if self.pos_grid.y < 0_f32 {
+            self.pos_grid.y = 0_f32;
+        }
+
         // self.pos_grid = (self.position - rem) / square_size;
         self.position = self.pos_grid * square_size;
         self.dragged = false;
-        println!("self.dragged=false");
         // TODO: show distance
     }
 
@@ -79,10 +125,16 @@ impl Token {
             rotation: 0_f32,
             flip_x: false,
             flip_y: false,
-            pivot: None
+            pivot: None,
         };
         self.draw_border(pos.clone(), square_size);
-        draw_texture_ex(self.texture, pos.x, pos.y, Color::from_rgba(255, 255, 255, 255), params);
+        draw_texture_ex(
+            self.texture,
+            pos.x,
+            pos.y,
+            Color::from_rgba(255, 255, 255, 255),
+            params,
+        );
     }
 
     fn draw_border(&self, pos: Vec2D, square_size: f32) {
@@ -90,15 +142,43 @@ impl Token {
         let size = self.size * square_size;
         let end = pos.clone() + size.clone();
         // draw_circle_lines((end.x + origin.x) / 2_f32, (end.y + origin.y) / 2_f32, size.x / 2_f32,2_f32, Color::from_rgba(0, 0, 0, 255));
-        draw_line(origin.x, origin.y, end.x, origin.y, 2_f32, Color::from_rgba(0, 0, 0, 255));
-        draw_line(origin.x, origin.y, origin.x, end.y, 2_f32, Color::from_rgba(0, 0, 0, 255));
-        draw_line(end.x, origin.y, end.x, end.y, 2_f32, Color::from_rgba(0, 0, 0, 255));
-        draw_line(origin.x, end.y, end.x, end.y, 2_f32, Color::from_rgba(0, 0, 0, 255));
+        draw_line(
+            origin.x,
+            origin.y,
+            end.x,
+            origin.y,
+            2_f32,
+            Color::from_rgba(0, 0, 0, 255),
+        );
+        draw_line(
+            origin.x,
+            origin.y,
+            origin.x,
+            end.y,
+            2_f32,
+            Color::from_rgba(0, 0, 0, 255),
+        );
+        draw_line(
+            end.x,
+            origin.y,
+            end.x,
+            end.y,
+            2_f32,
+            Color::from_rgba(0, 0, 0, 255),
+        );
+        draw_line(
+            origin.x,
+            end.y,
+            end.x,
+            end.y,
+            2_f32,
+            Color::from_rgba(0, 0, 0, 255),
+        );
     }
 
     pub fn click(&mut self) -> ClickAction {
         info!("click");
-        return self.click_action.clone()
+        return self.click_action.clone();
     }
 
     pub fn clicked(&mut self, clicked: bool) -> ClickMode {
@@ -107,18 +187,18 @@ impl Token {
             if self.click_counter >= 10 {
                 self.dragged = true;
                 println!("self.dragged=true");
-                return ClickMode::DRAGGED;
+                return ClickMode::Dragged;
             }
         } else {
             if self.click_counter < 10 {
                 self.click_counter = 0;
-                return ClickMode::CLICKED;
+                return ClickMode::Clicked;
             } else {
                 self.click_counter = 0;
-                return ClickMode::NONE;
+                return ClickMode::None;
             }
         }
-        return ClickMode::NONE;
+        return ClickMode::None;
     }
 }
 
@@ -126,28 +206,41 @@ pub struct Tokenlist {
     list: Vec<Token>,
     left_mouse: MB,
     active_token_idx: Option<i32>,
+    scene_size: Vec2D,
 }
 
 impl Tokenlist {
-
-    pub fn new(tokens: Option<Vec<Token>>) -> Self {
-        let left_mouse = MB{ was_up: true, start: Vec2D::empty()};
+    pub fn new(tokens: Option<Vec<Token>>, scene_size: Vec2D) -> Self {
+        let left_mouse = MB {
+            was_up: true,
+            start: Vec2D::empty(),
+        };
         if let Some(tokens) = tokens {
-            return Self{ list: tokens, left_mouse, active_token_idx: None };
+            return Self {
+                list: tokens,
+                left_mouse,
+                active_token_idx: None,
+                scene_size,
+            };
         } else {
-            return Self{ list: Vec::new(), left_mouse, active_token_idx: None };
+            return Self {
+                list: Vec::new(),
+                left_mouse,
+                active_token_idx: None,
+                scene_size,
+            };
         }
     }
 
     pub fn add(&mut self, mut token: Token, square_size: f32) {
-        token.final_move(square_size);
+        token.final_move(square_size, self.scene_size);
         self.list.push(token);
     }
 
     pub fn click(&mut self, position: Vec2D, square_size: f32) -> Option<ClickAction> {
         // println!("x: {}, y: {}", position.0 - mouse_position().0, position.1 - mouse_position().1);
 
-        if is_mouse_button_down(MouseButton::Left){
+        if is_mouse_button_down(MouseButton::Left) {
             if self.left_mouse.was_up {
                 self.left_mouse.was_up = false;
                 self.left_mouse.start = Vec2D::from(mouse_position());
@@ -163,24 +256,27 @@ impl Tokenlist {
             } else if self.active_token_idx != None {
                 let drag = Vec2D::empty() - self.left_mouse.start.clone() + mouse_position();
                 // println!("drag: {:?}", drag);
-                let token = self.list.get_mut(self.active_token_idx.unwrap() as usize).unwrap();
+                let token = self
+                    .list
+                    .get_mut(self.active_token_idx.unwrap() as usize)
+                    .unwrap();
                 match token.clicked(true) {
-                    ClickMode::DRAGGED => {
+                    ClickMode::Dragged => {
                         token.movement(drag);
-                    },
+                        self.left_mouse.start = Vec2D::from(mouse_position());
+                    }
                     _ => {}
                 }
-                self.left_mouse.start = Vec2D::from(mouse_position());
             }
-        } else if !self.left_mouse.was_up && !is_mouse_button_down(MouseButton::Left){
+        } else if !self.left_mouse.was_up && !is_mouse_button_down(MouseButton::Left) {
             self.left_mouse.was_up = true;
             if let Some(index) = self.active_token_idx {
                 let token = self.list.get_mut(index as usize).unwrap();
-                match token.clicked(false){
-                    ClickMode::CLICKED => return Some(token.click()),
-                    _ => {},
+                match token.clicked(false) {
+                    ClickMode::Clicked => return Some(token.click()),
+                    _ => {}
                 }
-                token.final_move(square_size);
+                token.final_move(square_size, self.scene_size);
                 self.active_token_idx = None;
             }
             self.active_token_idx = None;
@@ -196,7 +292,7 @@ impl Tokenlist {
 
     pub fn final_move(&mut self, square_size: f32) {
         for token in &mut self.list {
-            token.final_move(square_size);
+            token.final_move(square_size, self.scene_size);
         }
     }
 }

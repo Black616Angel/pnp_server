@@ -1,10 +1,10 @@
-use crate::types::*;
-use crate::token::*;
 use crate::camera::Camera as Cam;
 use crate::scene_json::*;
+use crate::token::*;
+use crate::types::*;
 
-use std::error::Error;
 use macroquad::prelude::*;
+use std::error::Error;
 
 pub struct Scene {
     pub name: String,
@@ -17,7 +17,10 @@ pub struct Scene {
 }
 
 impl Scene {
-    pub async fn new_from_file(filename: String, folder: Option<String>) -> Result<Self, Box<dyn Error>> {
+    pub async fn new_from_file(
+        filename: String,
+        folder: Option<String>,
+    ) -> Result<Self, Box<dyn Error>> {
         let contents = load_string(&filename).await?;
         info!("contents read");
         let folder: String = if let Some(folder) = folder {
@@ -36,12 +39,12 @@ impl Scene {
             }
             folder
         };
-        return Self::new_from_string(folder, contents).await
+        return Self::new_from_string(folder, contents).await;
     }
 
     pub async fn new_from_string(folder: String, data: String) -> Result<Self, Box<dyn Error>> {
         let json: SceneJson = serde_json::from_str(&data)?;
-        return Ok(Self::new_from_json(folder, json).await)
+        return Ok(Self::new_from_json(folder, json).await);
     }
 
     pub async fn new_from_json(folder: String, json: SceneJson) -> Self {
@@ -49,16 +52,30 @@ impl Scene {
         let height = json.height;
         let width = json.width;
         let square_size = json.square_size as f32;
-        let mut tokens: Tokenlist = Tokenlist::new(None);
+        let mut tokens: Tokenlist = Tokenlist::new(None, Vec2D::new(width as f32, height as f32));
         for token in json.tokens {
-            tokens.add(Token::new_from_json(folder.clone(), token, square_size).await, square_size)
+            tokens.add(
+                Token::new_from_json(folder.clone(), token, square_size).await,
+                square_size,
+            )
         }
         info!("Scene built");
-        Self{name, folder, height, width, cam: Cam::new(), tokens, square_size }
+        Self {
+            name,
+            folder,
+            height,
+            width,
+            cam: Cam::new(),
+            tokens,
+            square_size,
+        }
     }
 
     pub async fn add_token(&mut self, token: SceneJsonToken) {
-        self.tokens.add(Token::new_from_json(self.folder.clone(), token, self.square_size).await, self.square_size);
+        self.tokens.add(
+            Token::new_from_json(self.folder.clone(), token, self.square_size).await,
+            self.square_size,
+        );
     }
 
     pub fn draw(&mut self) {
@@ -70,8 +87,11 @@ impl Scene {
     }
 
     pub fn click(&mut self) -> Option<ClickAction> {
-        let local_mouse_pos = Vec2D::from((mouse_position().0 - self.cam.x(), mouse_position().1 - self.cam.y()));
-        return self.tokens.click( local_mouse_pos, self.square_size);
+        let local_mouse_pos = Vec2D::from((
+            mouse_position().0 - self.cam.x(),
+            mouse_position().1 - self.cam.y(),
+        ));
+        return self.tokens.click(local_mouse_pos, self.square_size);
     }
 
     fn scrolling(&mut self) {
@@ -92,7 +112,7 @@ impl Scene {
     fn draw_squares(&self, x: i32, y: i32, offset_x: f32, offset_y: f32) {
         // let sq_size = (screen_height() - offset_y * 2.) / x as f32;
         let sq_size = self.square_size;
-        for i in 0..x+1 {
+        for i in 0..x + 1 {
             draw_line(
                 offset_x + sq_size * i as f32,
                 offset_y,
@@ -103,7 +123,7 @@ impl Scene {
             );
         }
 
-        for i in 0..y+1 {
+        for i in 0..y + 1 {
             draw_line(
                 offset_x,
                 offset_y + sq_size * i as f32,
