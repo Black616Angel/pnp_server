@@ -1,8 +1,11 @@
 pub mod api;
 pub mod diff;
+pub mod server_jsons;
+pub mod user;
 
 use crate::api::Api;
-use crate::diff::Diff;
+// use crate::diff::Diff;
+use crate::user::User;
 
 use log::{info, LevelFilter};
 use log4rs::append::file::FileAppender;
