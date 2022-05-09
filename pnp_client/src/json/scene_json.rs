@@ -1,5 +1,5 @@
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use serde::{Serialize, Deserialize};
 use std::hash::Hash;
 
 use crate::json::*;
@@ -74,7 +74,7 @@ impl SceneJsonStat {
                 for el in arr {
                     self.hash_value(state, el)
                 }
-            },
+            }
             Value::Null => "".hash(state),
             Value::Bool(value) => value.hash(state),
             Value::Number(value) => value.hash(state),

@@ -2,6 +2,7 @@ pub mod camera;
 pub mod json;
 pub mod game_picker;
 pub mod params;
+pub mod fs;
 pub mod scene;
 #[cfg(test)]
 mod tests;

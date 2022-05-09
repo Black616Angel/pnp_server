@@ -1,6 +1,6 @@
 use std::{collections::HashMap, error::Error};
 
-use pnp_client::api_json::*;
+use pnp_client::json::*;
 
 pub struct Api {}
 

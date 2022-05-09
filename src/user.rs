@@ -1,4 +1,7 @@
 use crate::server_jsons::*;
+use serde::{Deserialize, Serialize};
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct User {
     pub session_id: String,
     uuid: String,

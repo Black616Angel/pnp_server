@@ -56,6 +56,19 @@ async fn main() {
             Api::call_all(call.clone(), root_api_all.clone()).unwrap_or("".to_string())
         )
     });
+    let api_user = warp::path!("user" / String).map(move |session_id| {
+        let session_id: String = session_id;
+        log::info!("{}", session_id);
+        if let Some(user) = User::read_sids(session_id, root_path) {
+            if let Ok(user) = serde_json::to_string(&user) {
+                format!("{}", user)
+            } else {
+                format!("")
+            }
+        } else {
+            format!("")
+        }
+    });
 
     let root_api_games = root.clone();
     let opt_query = warp::query::<HashMap<String, String>>()
@@ -94,6 +107,7 @@ async fn main() {
             .or(objects)
             .or(rulesets)
             .or(api_all)
+            .or(api_user)
             .or(api_games),
     );
 

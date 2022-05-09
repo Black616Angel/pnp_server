@@ -1,8 +1,8 @@
-use std::hash::{Hash, Hasher};
 use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
 
-use serde::{Serialize, Deserialize};
 use crate::json::*;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone, Debug, Hash)]
 pub struct DiffJson {
@@ -46,7 +46,7 @@ pub enum DiffTokenChange {
 
 impl DiffJson {
     pub fn new(old: SceneJson, new: SceneJson) -> Self {
-        // simple Macro to push all changed members 
+        // simple Macro to push all changed members
         macro_rules! diffpush_members {
             ($diff:expr, $member:ident) => {
                 if new.$member != old.$member {
@@ -67,8 +67,11 @@ impl DiffJson {
         diffpush_members!(diff, width);
         diffpush_members!(diff, texture_background);
 
-
-        return Self { hash, timestamp, diff }
+        return Self {
+            hash,
+            timestamp,
+            diff,
+        };
     }
 
     pub fn to_string(&self) -> String {
