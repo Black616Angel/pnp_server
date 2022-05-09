@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
 use macroquad::prelude::*;
-use crate::scene_json::*;
+use crate::json::scene_json::*;
 
 #[macroquad::test]
 async fn json_default_scene() {

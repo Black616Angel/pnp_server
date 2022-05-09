@@ -1,4 +1,4 @@
-use crate::{types::*, scene_json::{SceneJsonToken, ClickAction}};
+use crate::{types::*, json::scene_json::{SceneJsonToken, ClickAction}};
 
 use macroquad::prelude::*;
 

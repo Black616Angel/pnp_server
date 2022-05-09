@@ -1,10 +1,8 @@
-pub mod api_json;
 pub mod camera;
-pub mod diff_json;
+pub mod json;
 pub mod game_picker;
 pub mod params;
 pub mod scene;
-pub mod scene_json;
 #[cfg(test)]
 mod tests;
 pub mod token;
@@ -13,7 +11,7 @@ pub mod ui;
 pub mod user;
 
 use macroquad::prelude::*;
-use scene_json::ClickAction;
+use json::scene_json::ClickAction;
 
 use crate::game_picker::*;
 use crate::params::*;

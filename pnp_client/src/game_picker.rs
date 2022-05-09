@@ -3,9 +3,9 @@ use std::error::Error;
 
 use macroquad::prelude::load_string;
 
-use crate::api_json::StringVecJson;
+use crate::json::api_json::StringVecJson;
 use crate::scene::*;
-use crate::scene_json::*;
+use crate::json::scene_json::*;
 
 use macroquad::prelude::*;
 

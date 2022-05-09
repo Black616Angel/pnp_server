@@ -1,7 +1,7 @@
 use crate::types::*;
 use crate::token::*;
 use crate::camera::Camera as Cam;
-use crate::scene_json::*;
+use crate::json::scene_json::*;
 
 use std::error::Error;
 use macroquad::prelude::*;
