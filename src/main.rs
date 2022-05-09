@@ -56,10 +56,11 @@ async fn main() {
             Api::call_all(call.clone(), root_api_all.clone()).unwrap_or("".to_string())
         )
     });
-    let api_user = warp::path!("user" / String).map(move |session_id| {
+    let root_api_user = root.clone();
+    let api_user = warp::path!("api" / "user" / String).map(move |session_id| {
         let session_id: String = session_id;
         log::info!("{}", session_id);
-        if let Some(user) = User::read_sids(session_id, root_path) {
+        if let Some(user) = User::read_sids(session_id, root_api_user.clone()) {
             if let Ok(user) = serde_json::to_string(&user) {
                 format!("{}", user)
             } else {

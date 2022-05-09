@@ -1,6 +1,7 @@
 var ctx = null
 var memory
 
+// parameter and other website/url stuff
 params_set_mem = function (wasm_memory, _wasm_exports) {
   memory = wasm_memory
   ctx = {}
@@ -12,14 +13,17 @@ params_set_mem = function (wasm_memory, _wasm_exports) {
 }
 
 register_plugin = function (a) {
-  a.env.miniquad_parameters_param_count = function () {
+  a.env.site_parameters_param_count = function () {
     return ctx.entries.length
   }
-  a.env.miniquad_parameters_get_key = function (i) {
+  a.env.site_parameters_get_key = function (i) {
     return js_object(ctx.entries[i][0])
   }
-  a.env.miniquad_parameters_get_value = function (i) {
+  a.env.site_parameters_get_value = function (i) {
     return js_object(ctx.entries[i][1])
+  }
+  a.env.site_get_url = function (i) {
+    return js_object(window.location.host)
   }
 }
 

@@ -23,6 +23,7 @@ use crate::ui::*;
 async fn main() {
     // Gamepicker as root of it all
     info!("Started5");
+
     for param in PROGRAM_PARAMETERS.clone() {
         info!("{}: {}", param.key, param.value);
     }

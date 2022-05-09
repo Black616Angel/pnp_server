@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct User {
     pub name: String,
-    pub uid: String,
+    pub uuid: String,
     pub session_id: String,
     games: Vec<String>,
 }
