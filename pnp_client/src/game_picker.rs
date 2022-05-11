@@ -35,7 +35,7 @@ impl GamePicker {
             texture_background: None,
             tokens: Vec::new(),
         };
-        let game_names = Self::get_game_folders(&("api/games")).await?;
+        let game_names = Self::get_game_folders(&("api/games/get_all")).await?;
 
         let mut row = 1;
         let mut col = 1;

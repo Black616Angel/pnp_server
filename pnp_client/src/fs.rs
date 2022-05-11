@@ -1,6 +1,7 @@
 use crate::user::User;
 use macroquad::{file::*, prelude::load_texture};
 
+use crate::params::PROGRAM_PARAMETERS;
 // use reqwest::Client;
 
 pub struct File {}
@@ -8,7 +9,7 @@ pub struct File {}
 impl File {
     pub async fn read_sid(session_id: String) -> User {
         return serde_json::from_str(
-            &load_string(&("/api/user/".to_string() + &session_id))
+            &load_string(&format!("/api/users/get/{}?sid={}", session_id, session_id))
                 .await
                 .unwrap(),
         )
@@ -42,14 +43,13 @@ impl File {
             unsafe {
                 fs_write_file(path.as_ptr(), content.as_ptr());
             }
+            Ok("".to_string())
         }
 
         #[cfg(not(target_arch = "wasm32"))]
         {
             panic!("TODO");
         }
-
-        Ok("".to_string())
     }
 
     // pub async fn write(path: &str, content: String) -> Result<String, reqwest::Error> {

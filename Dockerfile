@@ -46,6 +46,6 @@ RUN apt-get update && apt-get install -y libc6-dev pkg-config libx11-dev libxi-d
 RUN mkdir /var/www/
 COPY --from=builder /usr/local/cargo/bin/pnp_server /usr/local/bin/pnp_server
 COPY ./files /var/www/.
-COPY --from=builder /usr/src/pnp_server/pnp_client/target/wasm32-unknown-unknown/release/pnp_client.wasm /var/www/root/pnp_client.wasm
+COPY --from=builder /usr/src/pnp_server/pnp_client/target/wasm32-unknown-unknown/release/pnp_client.wasm /var/www/pnp_client.wasm
 CMD ["pnp_server"]
 EXPOSE 8080/tcp

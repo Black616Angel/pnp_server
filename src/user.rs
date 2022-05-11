@@ -28,7 +28,7 @@ impl User {
 
     fn read_user(session: SessionJson, root_path: String) -> Option<Self> {
         let user_file: Result<UserJson, serde_json::Error> = serde_json::from_str(
-            &Self::read_file(root_path + "users/" + &session.uuid + ".json"),
+            &Self::read_file(format!("{}users/{}.json", root_path, &session.uuid)),
         );
         match user_file {
             Ok(user_file) => {
