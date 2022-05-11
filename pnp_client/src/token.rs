@@ -1,5 +1,5 @@
 use crate::{
-    scene_json::{ClickAction, SceneJsonToken},
+    json::scene_json::{ClickAction, SceneJsonToken},
     types::*,
 };
 

@@ -1,6 +1,6 @@
-use pnp_client::diff_json::*;
-use pnp_client::scene_json::*;
+use pnp_client::json::*;
 
+use crate::ROOT;
 pub struct Diff {}
 
 impl Diff {
@@ -12,11 +12,10 @@ impl Diff {
             let ret = ret.unwrap_err();
             return serde_json::ser::to_string(&ret).unwrap();
         }
-        
     }
 
     fn read_diffs(game_name: String, hash: String) -> Result<DiffJson, SceneJson> {
-        let folder = "/var/www/games/".to_string() + &game_name + "/";
+        let folder = format!("{}games/{}/", ROOT.to_string(), &game_name);
         let contents = Diff::read_file(folder.clone() + "DefaultScene.json");
         let diff_json: DefaultSceneJson = serde_json::de::from_str(&contents).unwrap();
 
@@ -25,12 +24,13 @@ impl Diff {
                 return Ok(diff);
             }
         }
-        let ret: SceneJson = serde_json::de::from_str(&Diff::read_file(folder + &diff_json.name)).unwrap();
+        let ret: SceneJson =
+            serde_json::de::from_str(&Diff::read_file(format!("{}{}", folder, &diff_json.name)))
+                .unwrap();
         Err(ret)
     }
 
     fn read_file(filename: String) -> String {
-        return std::fs::read_to_string(filename)
-            .expect("Something went wrong reading the file");
+        return std::fs::read_to_string(filename).expect("Something went wrong reading the file");
     }
 }

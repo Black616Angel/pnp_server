@@ -1,5 +1,6 @@
 use crate::camera::Camera as Cam;
-use crate::scene_json::*;
+use crate::fs::File;
+use crate::json::scene_json::*;
 use crate::token::*;
 use crate::types::*;
 
@@ -21,7 +22,7 @@ impl Scene {
         filename: String,
         folder: Option<String>,
     ) -> Result<Self, Box<dyn Error>> {
-        let contents = load_string(&filename).await?;
+        let contents = File::read_string(&filename).await?;
         info!("contents read");
         let folder: String = if let Some(folder) = folder {
             folder

@@ -1,11 +1,11 @@
 #![allow(dead_code)]
 
-use macroquad::prelude::*;
-use crate::scene_json::*;
+use crate::fs::File;
+use crate::json::scene_json::*;
 
 #[macroquad::test]
 async fn json_default_scene() {
-    let contents = load_string("../files/games/testgame/DefaultScene.json").await;
+    let contents = File::read_string("../files/games/testgame/DefaultScene.json").await;
     if let Ok(contents) = contents {
         let res: Result<DefaultSceneJson, serde_json::Error> = serde_json::from_str(&contents);
         if let Ok(ds) = res {
@@ -20,7 +20,8 @@ async fn json_default_scene() {
 
 #[macroquad::test]
 async fn json_scene() {
-    let contents = load_string("../files/games/testgame/Test_Scene.json").await;
+    let contents: Result<String, macroquad::file::FileError> =
+        File::read_string("../files/games/testgame/Test_Scene.json").await;
     if let Ok(contents) = contents {
         let res: Result<DefaultSceneJson, serde_json::Error> = serde_json::from_str(&contents);
         if let Ok(ds) = res {

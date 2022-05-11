@@ -1,20 +1,22 @@
 pub mod api;
 pub mod diff;
+pub mod server;
+pub mod server_jsons;
+pub mod user;
 
 use crate::api::Api;
-use crate::diff::Diff;
+use crate::server::Server;
 
 use log::{info, LevelFilter};
 use log4rs::append::file::FileAppender;
 use log4rs::config::{Appender, Config, Root};
 use log4rs::encode::pattern::PatternEncoder;
-use std::collections::HashMap;
+use tide::{Response, StatusCode};
 
-use warp::Filter;
+pub static ROOT: &str = "/var/www/";
 
 #[tokio::main]
 async fn main() {
-    let root: String = "/var/www/".to_string();
     let logfile = FileAppender::builder()
         .encoder(Box::new(PatternEncoder::new("{l} - {m}\n")))
         .build("output.log")
@@ -28,71 +30,27 @@ async fn main() {
     log4rs::init_config(config).unwrap();
     info!("Start1");
 
-    let file_index = root.clone() + "root/index.html";
-    let folder_main = root.clone() + "root/";
-    let folder_games = root.clone() + "games/";
-    let folder_objects = root.clone() + "objects/";
-    let folder_rulesets = root.clone() + "rulesets/";
-
-    let index = warp::get()
-        .and(warp::path::end())
-        .and(warp::fs::file(file_index));
-
-    // dir already requires GET...
-    let main = warp::path("root").and(warp::fs::dir(folder_main));
-    let games = warp::path("games").and(warp::fs::dir(folder_games));
-    let objects = warp::path("objects").and(warp::fs::dir(folder_objects));
-    let rulesets = warp::path("rulesets").and(warp::fs::dir(folder_rulesets));
-
-    let root_api_all = root.clone();
-    let api_all = warp::path!("api" / String).map(move |call| {
-        let call: String = call;
-        log::info!("{}", call);
-        format!(
-            "{}",
-            Api::call_all(call.clone(), root_api_all.clone()).unwrap_or("".to_string())
-        )
+    let mut serv = Server::new("0.0.0.0", "8080", ROOT.to_string());
+    serv.add_static("/", "");
+    serv.server.at("/root/pnp_client.wasm").get(|_| async move {
+        println!("test");
+        let res = Response::builder(StatusCode::Ok)
+            .content_type(tide::http::mime::WASM)
+            .body_file(format!("{}pnp_client.wasm", ROOT.to_string()))
+            .await;
+        match res {
+            Ok(res) => return Ok(res),
+            Err(e) => {
+                println!("{:}", e);
+                return Ok(Response::builder(StatusCode::Ok)
+                    .content_type(tide::http::mime::HTML)
+                    .body(""));
+            }
+        }
     });
-
-    let root_api_games = root.clone();
-    let opt_query = warp::query::<HashMap<String, String>>()
-        .map(Some)
-        .or_else(|_| async {
-            Ok::<(Option<HashMap<String, String>>,), std::convert::Infallible>((None,))
-        });
-    let api_games = warp::path!("api" / String / String).and(opt_query).map(
-        move |game_name: String, call: String, query: Option<HashMap<String, String>>| {
-            log::info!("{}: {}", call, game_name);
-            let query: HashMap<String, String> = if let Some(query) = query {
-                for (key, val) in query.iter() {
-                    log::info!("{}: {}", key, val);
-                }
-                query
-            } else {
-                HashMap::new()
-            };
-            format!(
-                "{}",
-                Api::call_game(
-                    call.clone(),
-                    game_name.clone(),
-                    root_api_games.clone(),
-                    query
-                )
-                .unwrap_or("".to_string())
-            )
-        },
-    );
-
-    let routes = warp::get().and(
-        index
-            .or(main)
-            .or(games)
-            .or(objects)
-            .or(rulesets)
-            .or(api_all)
-            .or(api_games),
-    );
-
-    warp::serve(routes).run(([0, 0, 0, 0], 8080)).await
+    serv.server.at("/api/*").get(Api::call_tide);
+    serv.server.at("/games/*").post(|_| async { Ok("") });
+    serv.server.at("/objects/*").post(|_| async { Ok("") });
+    serv.server.at("/rulesets/*").post(|_| async { Ok("") });
+    serv.run().await.unwrap();
 }

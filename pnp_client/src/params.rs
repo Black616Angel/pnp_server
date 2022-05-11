@@ -13,22 +13,22 @@ lazy_static! {
             use sapp_jsutils::JsObject;
 
             extern "C" {
-                fn miniquad_parameters_param_count() -> i32;
-                fn miniquad_parameters_get_key(pos: i32) -> JsObject;
-                fn miniquad_parameters_get_value(pos: i32) -> JsObject;
+                fn site_parameters_param_count() -> i32;
+                fn site_parameters_get_key(pos: i32) -> JsObject;
+                fn site_parameters_get_value(pos: i32) -> JsObject;
             }
 
-            let count = unsafe { miniquad_parameters_param_count() };
+            let count = unsafe { site_parameters_param_count() };
             let mut result: Vec<KeyValuePair> = Vec::new();
             for i in 0..count {
                 let mut key = String::new();
                 unsafe {
-                    miniquad_parameters_get_key(i).to_string(&mut key);
+                    site_parameters_get_key(i).to_string(&mut key);
                 }
 
                 let mut value = String::new();
                 unsafe {
-                    miniquad_parameters_get_value(i).to_string(&mut value);
+                    site_parameters_get_value(i).to_string(&mut value);
                 }
                 result.push(KeyValuePair { key, value });
             }

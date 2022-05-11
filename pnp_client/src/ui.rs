@@ -8,7 +8,9 @@ pub struct UIList {
 
 impl UIList {
     pub fn new() -> Self {
-        Self{ buttons: Vec::new() }
+        Self {
+            buttons: Vec::new(),
+        }
     }
 
     pub fn add_button(&mut self, btn: Button) {
@@ -40,13 +42,21 @@ pub struct Button {
 
 impl Button {
     pub fn new(text: String, position: Vec2D, size: Vec2D, color: Color, fun: fn()) -> Self {
-        Button { text, position, size, color, fun }
+        Button {
+            text,
+            position,
+            size,
+            color,
+            fun,
+        }
     }
 
     pub fn draw(&self) {
         let text_size = (self.size.y * 0.8) as u16;
         let mut font_scale = 1_f32;
-        while measure_text(&self.text, Some(Font::default()), text_size, font_scale).width > (self.size.x * 0.8) {
+        while measure_text(&self.text, Some(Font::default()), text_size, font_scale).width
+            > (self.size.x * 0.8)
+        {
             font_scale = font_scale * 0.8;
         }
 
@@ -54,8 +64,25 @@ impl Button {
         let text_x = self.position.x + self.size.x * 0.1;
         let text_y = self.position.y + self.position.y * 0.1 + text_size;
 
-        draw_rectangle(self.position.x, self.position.y, self.size.x, self.size.y, self.color);
-        draw_text(&self.text, text_x, text_y, text_size, Color { r: 0_f32, g: 0_f32, b: 0_f32, a: 255_f32 });
+        draw_rectangle(
+            self.position.x,
+            self.position.y,
+            self.size.x,
+            self.size.y,
+            self.color,
+        );
+        draw_text(
+            &self.text,
+            text_x,
+            text_y,
+            text_size,
+            Color {
+                r: 0_f32,
+                g: 0_f32,
+                b: 0_f32,
+                a: 255_f32,
+            },
+        );
     }
 
     pub fn click(&self) {
