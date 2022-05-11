@@ -6,10 +6,10 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-# Server
+# rouille = "3.5.0"
+# Server selbst
 tokio = { version = "1", features = ["full"] }
-tide = { path="../tide", features = ["logger"] }
-anyhow = "1.0.57"
+warp = "0.3"
 
 # Files:
 serde = { version = "1.0", features = ["derive"] }
@@ -18,5 +18,5 @@ serde_json = "1.0"
 pnp_client = { path = "pnp_client", version ="*" }
 
 # Logging
-log4rs ="1.1.1"
+log4rs ="1.0.0"
 log ="0.4.16"
