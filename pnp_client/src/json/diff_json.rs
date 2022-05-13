@@ -1,12 +1,8 @@
-use std::collections::hash_map::DefaultHasher;
-use std::hash::{Hash, Hasher};
-
 use crate::json::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone, Debug, Hash)]
 pub struct DiffJson {
-    pub hash: String,
     pub timestamp: String,
     pub diff: Vec<DiffJsonObject>,
 }
@@ -37,7 +33,7 @@ pub enum DiffTokenChange {
     description(String),
     texture_path(String),
     stats(SceneJsonStat),
-    StatsNew(SceneJsonStat),
+    stats_new(SceneJsonStat),
     height(i32),
     width(i32),
     position_x(i32),
@@ -54,9 +50,6 @@ impl DiffJson {
                 }
             };
         }
-        let mut hasher = DefaultHasher::new();
-        new.hash(&mut hasher);
-        let hash = hasher.finish().to_string();
         let timestamp = "".to_string();
 
         let mut diff: Vec<DiffJsonObject> = Vec::new();
@@ -67,11 +60,12 @@ impl DiffJson {
         diffpush_members!(diff, width);
         diffpush_members!(diff, texture_background);
 
-        return Self {
-            hash,
-            timestamp,
-            diff,
-        };
+        return Self { timestamp, diff };
+    }
+
+    pub fn new_vec(diff: Vec<DiffJsonObject>) -> Self {
+        let timestamp = "".to_string();
+        Self { timestamp, diff }
     }
 
     pub fn to_string(&self) -> String {

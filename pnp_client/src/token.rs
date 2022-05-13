@@ -1,5 +1,8 @@
 use crate::{
-    json::scene_json::{ClickAction, SceneJsonToken},
+    json::{
+        scene_json::{ClickAction, SceneJsonToken},
+        DiffJson, DiffJsonObject, DiffTokenChange,
+    },
     types::*,
 };
 
@@ -63,7 +66,7 @@ impl Token {
         self.position += direction;
     }
 
-    pub fn final_move(&mut self, square_size: f32, scene_size: Vec2D) {
+    pub fn final_move(&mut self, square_size: f32, scene_size: Vec2D) -> DiffJson {
         let rem = self.position.clone() % square_size;
         self.pos_grid.x = if rem.x > square_size / 2_f32 {
             (self.position.x - rem.x) / square_size + 1_f32
@@ -109,6 +112,12 @@ impl Token {
         self.position = self.pos_grid * square_size;
         self.dragged = false;
         // TODO: show distance
+
+        // return the Change
+        return DiffJson::new_vec(vec![
+            DiffJsonObject::Token(DiffTokenChange::position_x(self.pos_grid.x as i32)),
+            DiffJsonObject::Token(DiffTokenChange::position_y(self.pos_grid.y as i32)),
+        ]);
     }
 
     pub fn draw(&self, offset: &Vec2D, square_size: f32) {
@@ -276,8 +285,9 @@ impl Tokenlist {
                     ClickMode::Clicked => return Some(token.click()),
                     _ => {}
                 }
-                token.final_move(square_size, self.scene_size);
+                let diff = token.final_move(square_size, self.scene_size);
                 self.active_token_idx = None;
+                return Some(ClickAction::Moved(diff));
             }
             self.active_token_idx = None;
         }
@@ -293,6 +303,7 @@ impl Tokenlist {
     pub fn final_move(&mut self, square_size: f32) {
         for token in &mut self.list {
             token.final_move(square_size, self.scene_size);
+            todo!("must find other method for masses");
         }
     }
 }

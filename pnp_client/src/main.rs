@@ -18,6 +18,7 @@ use crate::game_picker::*;
 use crate::params::*;
 use crate::scene::*;
 use crate::ui::*;
+use crate::fs::File;
 
 #[macroquad::main("PnP")]
 async fn main() {
@@ -33,11 +34,18 @@ async fn main() {
     let mut ui = UIList::new();
 
     let mut next_scene: Option<String> = None;
+    let mut game_name = "None".to_string();
     loop {
         if let Some(action) = scene.click() {
             match action {
                 ClickAction::SceneChange(scene) => {
                     next_scene = Some(scene);
+                },
+                ClickAction::Moved(diff) => {
+                    match File::write(&format!("api/games/diff/{}", game_name.clone()), serde_json::json!(diff).to_string()).await {
+                        Ok(_) => {},
+                        Err(e) => {error!("{:?}", e);}
+                    }
                 }
                 _ => {}
             }
@@ -55,6 +63,7 @@ async fn main() {
                 let split = next_scene_name.split("/").collect::<Vec<&str>>();
                 if split.len() == 2 {
                     let folder = gp.root_folder.clone() + "games/" + split[0] + "/";
+                    game_name = split[0].to_string();
                     let filename = folder.clone() + split[1];
                     // info!("filename: {}", filename);
                     if let Ok(new) = Scene::new_from_file(filename, Some(folder)).await {

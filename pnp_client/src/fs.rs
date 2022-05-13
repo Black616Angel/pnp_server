@@ -1,9 +1,6 @@
 use crate::user::User;
 use macroquad::{file::*, prelude::load_texture};
 
-use crate::params::PROGRAM_PARAMETERS;
-// use reqwest::Client;
-
 pub struct File {}
 
 impl File {
@@ -29,27 +26,44 @@ impl File {
         Ok(load_texture(&path).await?)
     }
 
+    #[cfg(target_arch = "wasm32")]
     pub async fn write(path: &str, content: String) -> Result<String, std::io::Error> {
-        #[cfg(target_arch = "wasm32")]
-        {
-            use std::ffi::CString;
-            use std::os::raw::c_char;
+        use std::ffi::CString;
 
-            extern "C" {
-                pub fn fs_write_file(path: *const c_char, content: *const c_char);
-            }
-            let path = CString::new(path)?;
-            let content = CString::new(content)?;
-            unsafe {
-                fs_write_file(path.as_ptr(), content.as_ptr());
-            }
-            Ok("".to_string())
-        }
+        use macroquad::prelude::info;
 
-        #[cfg(not(target_arch = "wasm32"))]
-        {
-            panic!("TODO");
+        extern "C" {
+            pub fn fs_write_file(
+                path: *const i8,
+                path_len: u32,
+                content: *const i8,
+                content_len: u32,
+            );
         }
+        let path = format!(
+            "http://{}/{}?sid={}",
+            Self::get_url(),
+            path,
+            User::get().await.session_id
+        );
+        info!("path: {}", path);
+        info!("content: {}", content);
+        let path = CString::new(path)?;
+        let content = CString::new(content)?;
+        unsafe {
+            fs_write_file(
+                path.as_ptr(),
+                path.as_bytes().len() as u32,
+                content.as_ptr(),
+                content.as_bytes().len() as u32,
+            );
+        }
+        Ok("success".to_string())
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    pub async fn write(_path: &str, _content: String) -> Result<String, std::io::Error> {
+        Ok("success".to_string())
     }
 
     // pub async fn write(path: &str, content: String) -> Result<String, reqwest::Error> {

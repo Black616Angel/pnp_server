@@ -59,6 +59,8 @@ pub enum ClickAction {
     SceneChange(String),
     /// show token stats
     ShowStats(String),
+    /// moved token
+    Moved(DiffJson),
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]

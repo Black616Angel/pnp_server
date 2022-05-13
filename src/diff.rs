@@ -4,33 +4,18 @@ use crate::ROOT;
 pub struct Diff {}
 
 impl Diff {
-    pub fn get_diff(game_name: String, hash: String) -> String {
-        let ret = Diff::read_diffs(game_name, hash);
-        if let Ok(ret) = ret {
-            return ret.to_string();
+    pub fn write_diff(game_name: String, diff: DiffJson) -> Result<String, String> {
+        let contents =
+            Self::read_file(&(format!("{}games/{}/DefaultScene.json", ROOT.clone(), game_name)));
+        let res: Result<DefaultSceneJson, serde_json::Error> = serde_json::from_str(&contents);
+        if let Ok(json) = res {
         } else {
-            let ret = ret.unwrap_err();
-            return serde_json::ser::to_string(&ret).unwrap();
+            return Err("Error with json in file".to_string());
         }
+        Ok("".to_string())
     }
 
-    fn read_diffs(game_name: String, hash: String) -> Result<DiffJson, SceneJson> {
-        let folder = format!("{}games/{}/", ROOT.to_string(), &game_name);
-        let contents = Diff::read_file(folder.clone() + "DefaultScene.json");
-        let diff_json: DefaultSceneJson = serde_json::de::from_str(&contents).unwrap();
-
-        for diff in diff_json.diffs {
-            if diff.hash == hash {
-                return Ok(diff);
-            }
-        }
-        let ret: SceneJson =
-            serde_json::de::from_str(&Diff::read_file(format!("{}{}", folder, &diff_json.name)))
-                .unwrap();
-        Err(ret)
-    }
-
-    fn read_file(filename: String) -> String {
+    fn read_file(filename: &str) -> String {
         return std::fs::read_to_string(filename).expect("Something went wrong reading the file");
     }
 }
